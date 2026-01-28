@@ -209,8 +209,82 @@ function deleteEvent() {
     renderEvents('all-events-container');
 }
 
+// ==================== FAN FAVOURITE GAMES ====================
+
+// Default games
+const defaultGames = ["Among Us", "Gartic Phone", "Roblox Horror Games"];
+
+// Load games from localStorage
+function loadGames() {
+    const stored = localStorage.getItem('roadblocks-games');
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    return defaultGames;
+}
+
+// Save games to localStorage
+function saveGames(games) {
+    localStorage.setItem('roadblocks-games', JSON.stringify(games));
+}
+
+// Render games
+function renderGames() {
+    const container = document.getElementById('games-container');
+    if (!container) return;
+    
+    const games = loadGames();
+    container.innerHTML = '';
+    
+    if (games.length === 0) {
+        container.innerHTML = '<p class="no-games">No games added yet.</p>';
+        return;
+    }
+    
+    games.forEach(game => {
+        const gameTag = document.createElement('div');
+        gameTag.className = 'game-tag';
+        gameTag.innerHTML = `<span>${game}</span>`;
+        container.appendChild(gameTag);
+    });
+}
+
+// Open add game modal
+function openAddGameModal() {
+    document.getElementById('add-game-name').value = '';
+    document.getElementById('add-game-modal').classList.add('active');
+}
+
+// Close add game modal
+function closeAddGameModal() {
+    document.getElementById('add-game-modal').classList.remove('active');
+}
+
+// Add new game
+function addGame() {
+    const name = document.getElementById('add-game-name').value.trim();
+    if (!name) return;
+    
+    const games = loadGames();
+    games.push(name);
+    saveGames(games);
+    closeAddGameModal();
+    renderGames();
+}
+
+// Remove game by index
+function removeGame(index) {
+    let games = loadGames();
+    if (index >= 0 && index < games.length) {
+        games.splice(index, 1);
+        saveGames(games);
+        renderGames();
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     renderEvents('events-container', 2);
     renderEvents('all-events-container');
+    renderGames();
 });

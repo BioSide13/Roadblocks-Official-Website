@@ -22,12 +22,33 @@
             <p>Cultured People Only</p>
         </section>
 
+        <section class="fan-favourites">
+            <div class="section-header">
+                <h2>🎮 Fan Favourite Games</h2>
+                <button class="add-btn" onclick="openAddGameModal()">+ Add Game</button>
+            </div>
+            <div id="games-container" class="games-grid"></div>
+        </section>
+
         <section class="upcoming-events">
             <h2>Upcoming Events</h2>
             <div id="events-container"></div>
             <p><a href="events.html">View all events →</a></p>
         </section>
     </main>
+
+    <!-- Add Game Modal -->
+    <div id="add-game-modal" class="modal">
+        <div class="modal-content">
+            <h2>Add Fan Favourite Game</h2>
+            <label>Game Name</label>
+            <input type="text" id="add-game-name" placeholder="e.g., Among Us">
+            <div class="modal-buttons">
+                <button class="save-btn" onclick="addGame()">Add Game</button>
+                <button class="cancel-btn" onclick="closeAddGameModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Edit Event Modal -->
     <div id="edit-modal" class="modal">

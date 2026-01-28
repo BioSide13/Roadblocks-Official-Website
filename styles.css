@@ -114,6 +114,66 @@ a {
     margin-bottom: 30px;
 }
 
+/* Section Header */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin-bottom: 0;
+}
+
+/* Fan Favourite Games */
+.fan-favourites {
+    margin-bottom: 40px;
+}
+
+.games-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.game-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--nav-bg);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 0.95rem;
+}
+
+.game-tag span {
+    font-weight: 500;
+}
+
+.remove-game-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.7;
+    padding: 0;
+    line-height: 1;
+    transition: opacity 0.2s ease;
+}
+
+.remove-game-btn:hover {
+    opacity: 1;
+}
+
+.no-games {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Upcoming Events */
 .upcoming-events h2 {
     font-weight: 600;
     margin-bottom: 20px;
@@ -305,6 +365,61 @@ a {
     text-align: center;
     font-style: italic;
     color: var(--text-secondary);
+}
+
+/* People Section */
+.people-section h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.people-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.person-card {
+    background-color: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.person-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+.person-card img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid var(--accent);
+}
+
+.person-card h4 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.person-card .quote {
+    color: var(--accent);
+    font-style: italic;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.person-card .descriptor {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0;
 }
 
 /* Mobile: Nav at bottom */
