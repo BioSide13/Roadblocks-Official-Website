@@ -1,3 +1,5 @@
+// ==================== FIREBASE DATA ====================
+
 // Default events data
 const defaultEvents = [
     {
@@ -20,19 +22,89 @@ const defaultEvents = [
     }
 ];
 
-// Load events from localStorage or use defaults
-function loadEvents() {
-    const stored = localStorage.getItem('roadblocks-events');
-    if (stored) {
-        return JSON.parse(stored);
-    }
-    return defaultEvents;
+// Default games
+const defaultGames = ["Among Us", "Gartic Phone", "Roblox Horror Games"];
+
+// Global data storage
+let eventsData = [];
+let gamesData = [];
+
+// ==================== FIREBASE EVENTS ====================
+
+// Load events from Firebase
+function loadEventsFromFirebase() {
+    const eventsRef = database.ref('events');
+    eventsRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            eventsData = Object.values(data);
+        } else {
+            // Initialize with defaults if empty
+            eventsData = defaultEvents;
+            saveEventsToFirebase(eventsData);
+        }
+        renderEvents('events-container', 2);
+        renderEvents('all-events-container');
+    });
 }
 
-// Save events to localStorage
-function saveEvents(events) {
-    localStorage.setItem('roadblocks-events', JSON.stringify(events));
+// Save events to Firebase
+function saveEventsToFirebase(events) {
+    const eventsRef = database.ref('events');
+    const eventsObject = {};
+    events.forEach(event => {
+        eventsObject[event.id] = event;
+    });
+    eventsRef.set(eventsObject);
 }
+
+// Get events (now uses global data)
+function loadEvents() {
+    return eventsData;
+}
+
+// Save events
+function saveEvents(events) {
+    eventsData = events;
+    saveEventsToFirebase(events);
+}
+
+// ==================== FIREBASE GAMES ====================
+
+// Load games from Firebase
+function loadGamesFromFirebase() {
+    const gamesRef = database.ref('games');
+    gamesRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            gamesData = data;
+        } else {
+            // Initialize with defaults if empty
+            gamesData = defaultGames;
+            saveGamesToFirebase(gamesData);
+        }
+        renderGames();
+    });
+}
+
+// Save games to Firebase
+function saveGamesToFirebase(games) {
+    const gamesRef = database.ref('games');
+    gamesRef.set(games);
+}
+
+// Get games (now uses global data)
+function loadGames() {
+    return gamesData;
+}
+
+// Save games
+function saveGames(games) {
+    gamesData = games;
+    saveGamesToFirebase(games);
+}
+
+// ==================== EVENTS FUNCTIONS ====================
 
 // Sort events by date and time
 function sortEventsByDate(events) {
@@ -211,23 +283,6 @@ function deleteEvent() {
 
 // ==================== FAN FAVOURITE GAMES ====================
 
-// Default games
-const defaultGames = ["Among Us", "Gartic Phone", "Roblox Horror Games"];
-
-// Load games from localStorage
-function loadGames() {
-    const stored = localStorage.getItem('roadblocks-games');
-    if (stored) {
-        return JSON.parse(stored);
-    }
-    return defaultGames;
-}
-
-// Save games to localStorage
-function saveGames(games) {
-    localStorage.setItem('roadblocks-games', JSON.stringify(games));
-}
-
 // Render games
 function renderGames() {
     const container = document.getElementById('games-container');
@@ -269,22 +324,20 @@ function addGame() {
     games.push(name);
     saveGames(games);
     closeAddGameModal();
-    renderGames();
 }
 
-// Remove game by index
+// Remove game by index (developer only - use in console)
 function removeGame(index) {
     let games = loadGames();
     if (index >= 0 && index < games.length) {
         games.splice(index, 1);
         saveGames(games);
-        renderGames();
     }
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    renderEvents('events-container', 2);
-    renderEvents('all-events-container');
-    renderGames();
+    // Load data from Firebase (this will trigger renders automatically)
+    loadEventsFromFirebase();
+    loadGamesFromFirebase();
 });
