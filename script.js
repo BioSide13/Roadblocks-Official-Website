@@ -1,0 +1,201 @@
+// Default events data
+const defaultEvents = [
+    {
+        id: 1,
+        title: "MARTY SUPREMEEEE",
+        date: "2026-01-31T14:00",
+        location: "Ambience",
+        activity: "Marty Supreme Movie",
+        people: "Nimeesha, Tanish, Olwethu"
+    },
+    {
+        id: 2,
+        title: "Game Night",
+        date: "2026-01-31T19:00",
+        location: "Discord + Whatsapp for Yuppaya",
+        activity: "Fan Favourites including Among Us, Gartic Phone, Roblox Horror Games",
+        people: "Hopefully Everyone"
+    }
+];
+
+// Load events from localStorage or use defaults
+function loadEvents() {
+    const stored = localStorage.getItem('roadblocks-events');
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    return defaultEvents;
+}
+
+// Save events to localStorage
+function saveEvents(events) {
+    localStorage.setItem('roadblocks-events', JSON.stringify(events));
+}
+
+// Sort events by date
+function sortEventsByDate(events) {
+    return events.sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
+// Format date for display
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = { 
+        weekday: 'short',
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+    };
+    return date.toLocaleDateString('en-US', options);
+}
+
+// Create event card HTML
+function createEventCard(event, showEditButton = true) {
+    const card = document.createElement('div');
+    card.className = 'event-card';
+    card.dataset.id = event.id;
+    
+    card.innerHTML = `
+        <div class="event-header">
+            <h3>${event.title}</h3>
+            ${showEditButton ? `<button class="edit-btn" onclick="openEditModal(${event.id})">Edit</button>` : ''}
+        </div>
+        <div class="event-details">
+            <p><strong>📅 Date & Time:</strong> ${formatDate(event.date)}</p>
+            <p><strong>📍 Location:</strong> ${event.location}</p>
+            <p><strong>🎯 Activity:</strong> ${event.activity}</p>
+            <p><strong>👥 People Confirmed:</strong> ${event.people}</p>
+        </div>
+    `;
+    
+    return card;
+}
+
+// Render events to the page
+function renderEvents(containerId, limit = null) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    let events = sortEventsByDate(loadEvents());
+    
+    // Filter to only show future events
+    const now = new Date();
+    events = events.filter(e => new Date(e.date) >= now);
+    
+    if (limit) {
+        events = events.slice(0, limit);
+    }
+    
+    container.innerHTML = '';
+    
+    if (events.length === 0) {
+        container.innerHTML = '<p class="no-events">No upcoming events scheduled.</p>';
+        return;
+    }
+    
+    events.forEach(event => {
+        container.appendChild(createEventCard(event));
+    });
+}
+
+// Open edit modal
+function openEditModal(eventId) {
+    const events = loadEvents();
+    const event = events.find(e => e.id === eventId);
+    if (!event) return;
+    
+    document.getElementById('edit-event-id').value = event.id;
+    document.getElementById('edit-title').value = event.title;
+    document.getElementById('edit-date').value = event.date;
+    document.getElementById('edit-location').value = event.location;
+    document.getElementById('edit-activity').value = event.activity;
+    document.getElementById('edit-people').value = event.people;
+    
+    document.getElementById('edit-modal').classList.add('active');
+}
+
+// Close edit modal
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.remove('active');
+}
+
+// Save event changes
+function saveEventChanges() {
+    const id = parseInt(document.getElementById('edit-event-id').value);
+    const events = loadEvents();
+    const eventIndex = events.findIndex(e => e.id === id);
+    
+    if (eventIndex === -1) return;
+    
+    events[eventIndex] = {
+        id: id,
+        title: document.getElementById('edit-title').value,
+        date: document.getElementById('edit-date').value,
+        location: document.getElementById('edit-location').value,
+        activity: document.getElementById('edit-activity').value,
+        people: document.getElementById('edit-people').value
+    };
+    
+    saveEvents(events);
+    closeEditModal();
+    
+    // Re-render events on both pages if elements exist
+    renderEvents('events-container', 2);
+    renderEvents('all-events-container');
+}
+
+// Add new event
+function openAddModal() {
+    document.getElementById('add-title').value = '';
+    document.getElementById('add-date').value = '';
+    document.getElementById('add-location').value = '';
+    document.getElementById('add-activity').value = '';
+    document.getElementById('add-people').value = '';
+    
+    document.getElementById('add-modal').classList.add('active');
+}
+
+function closeAddModal() {
+    document.getElementById('add-modal').classList.remove('active');
+}
+
+function addNewEvent() {
+    const events = loadEvents();
+    const newId = Math.max(...events.map(e => e.id), 0) + 1;
+    
+    const newEvent = {
+        id: newId,
+        title: document.getElementById('add-title').value,
+        date: document.getElementById('add-date').value,
+        location: document.getElementById('add-location').value,
+        activity: document.getElementById('add-activity').value,
+        people: document.getElementById('add-people').value
+    };
+    
+    events.push(newEvent);
+    saveEvents(events);
+    closeAddModal();
+    
+    renderEvents('events-container', 2);
+    renderEvents('all-events-container');
+}
+
+// Delete event
+function deleteEvent() {
+    const id = parseInt(document.getElementById('edit-event-id').value);
+    let events = loadEvents();
+    events = events.filter(e => e.id !== id);
+    saveEvents(events);
+    closeEditModal();
+    
+    renderEvents('events-container', 2);
+    renderEvents('all-events-container');
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    renderEvents('events-container', 2);
+    renderEvents('all-events-container');
+});

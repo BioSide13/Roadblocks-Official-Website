@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/webp" href="logo.webp">
+    <link rel="stylesheet" href="styles.css">
+    <title>Roadblocks Official Website</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="events.html" class="active">Upcoming Events</a></li>
+            <li><a href="imp.html">Important Links</a></li>
+            <li><a href="ppl.html">The People of Roadblocks</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section class="upcoming-events">
+            <div class="events-header">
+                <h2>All Upcoming Events</h2>
+                <button class="add-btn" onclick="openAddModal()">+ Add Event</button>
+            </div>
+            <div id="all-events-container"></div>
+        </section>
+    </main>
+
+    <!-- Edit Event Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Event</h2>
+            <input type="hidden" id="edit-event-id">
+            <label>Title</label>
+            <input type="text" id="edit-title">
+            <label>Date & Time</label>
+            <input type="datetime-local" id="edit-date">
+            <label>Location</label>
+            <input type="text" id="edit-location">
+            <label>Activity</label>
+            <input type="text" id="edit-activity">
+            <label>People Confirmed</label>
+            <input type="text" id="edit-people">
+            <div class="modal-buttons">
+                <button class="save-btn" onclick="saveEventChanges()">Save</button>
+                <button class="delete-btn" onclick="deleteEvent()">Delete</button>
+                <button class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div id="add-modal" class="modal">
+        <div class="modal-content">
+            <h2>Add New Event</h2>
+            <label>Title</label>
+            <input type="text" id="add-title">
+            <label>Date & Time</label>
+            <input type="datetime-local" id="add-date">
+            <label>Location</label>
+            <input type="text" id="add-location">
+            <label>Activity</label>
+            <input type="text" id="add-activity">
+            <label>People Confirmed</label>
+            <input type="text" id="add-people">
+            <div class="modal-buttons">
+                <button class="save-btn" onclick="addNewEvent()">Add Event</button>
+                <button class="cancel-btn" onclick="closeAddModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap');
+
+/* Color Palette - Pastel Pink & Green */
+:root {
+    --bg-primary: #f8e1e5;
+    --bg-secondary: #ffffff;
+    --text-primary: #4a5568;
+    --text-secondary: #718096;
+    --nav-bg: #98d4a4;
+    --nav-hover: #7bc48a;
+    --nav-active: #5ba36a;
+    --accent: #d4808f;
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Nunito", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* Navigation Bar */
+nav {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background-color: var(--nav-bg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+nav ul li {
+    flex: 1;
+    text-align: center;
+}
+
+nav ul li a {
+    display: block;
+    color: white;
+    padding: 15px 20px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+nav ul li a:hover {
+    background-color: var(--nav-hover);
+}
+
+nav ul li a.active {
+    background-color: var(--nav-active);
+}
+
+/* Main Content */
+main {
+    margin-top: 50px;
+    padding: 30px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1, h2, h3 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+
+p {
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+}
+
+a {
+    color: var(--accent);
+}
+
+/* Welcome Section */
+.welcome {
+    text-align: center;
+    padding: 40px 20px;
+    margin-bottom: 30px;
+}
+
+.welcome h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.welcome p {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Upcoming Events Section */
+.upcoming-events {
+    margin-bottom: 30px;
+}
+
+.upcoming-events h2 {
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Event Cards */
+.event-card {
+    background-color: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.event-card h3 {
+    font-weight: 600;
+    color: var(--nav-bg);
+    margin-bottom: 15px;
+}
+
+.event-details p {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.event-details strong {
+    color: var(--text-primary);
+}
+
+/* Event Header */
+.event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.event-header h3 {
+    margin-bottom: 0;
+}
+
+.events-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.events-header h2 {
+    margin-bottom: 0;
+}
+
+/* Buttons */
+.edit-btn, .add-btn, .save-btn, .cancel-btn, .delete-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.edit-btn {
+    background-color: var(--accent);
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #c06b7a;
+}
+
+.add-btn {
+    background-color: var(--nav-bg);
+    color: white;
+    font-weight: 600;
+}
+
+.add-btn:hover {
+    background-color: var(--nav-hover);
+}
+
+.save-btn {
+    background-color: var(--nav-bg);
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: var(--nav-active);
+}
+
+.cancel-btn {
+    background-color: #ccc;
+    color: #333;
+}
+
+.cancel-btn:hover {
+    background-color: #bbb;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--bg-secondary);
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.modal-content label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.no-events {
+    text-align: center;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+/* Mobile: Nav at bottom */
+@media (max-width: 768px) {
+    nav {
+        top: auto;
+        bottom: 0;
+        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    main {
+        margin-top: 0;
+        margin-bottom: 50px;
+    }
+}
