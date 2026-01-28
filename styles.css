@@ -277,6 +277,24 @@ a {
     border-color: var(--accent);
 }
 
+.date-time-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.date-field {
+    flex: 1;
+}
+
+.time-field {
+    flex: 1;
+}
+
+.date-time-row input {
+    margin-bottom: 0;
+}
+
 .modal-buttons {
     display: flex;
     gap: 10px;

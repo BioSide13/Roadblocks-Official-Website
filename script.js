@@ -3,7 +3,8 @@ const defaultEvents = [
     {
         id: 1,
         title: "MARTY SUPREMEEEE",
-        date: "2026-01-31T14:00",
+        date: "2026-01-31",
+        time: "14:00",
         location: "Ambience",
         activity: "Marty Supreme Movie",
         people: "Nimeesha, Tanish, Olwethu"
@@ -11,7 +12,8 @@ const defaultEvents = [
     {
         id: 2,
         title: "Game Night",
-        date: "2026-01-31T19:00",
+        date: "2026-01-31",
+        time: "19:00",
         location: "Discord + Whatsapp for Yuppaya",
         activity: "Fan Favourites including Among Us, Gartic Phone, Roblox Horror Games",
         people: "Hopefully Everyone"
@@ -32,23 +34,32 @@ function saveEvents(events) {
     localStorage.setItem('roadblocks-events', JSON.stringify(events));
 }
 
-// Sort events by date
+// Sort events by date and time
 function sortEventsByDate(events) {
-    return events.sort((a, b) => new Date(a.date) - new Date(b.date));
+    return events.sort((a, b) => {
+        const dateA = new Date(`${a.date}T${a.time || '00:00'}`);
+        const dateB = new Date(`${b.date}T${b.time || '00:00'}`);
+        return dateA - dateB;
+    });
 }
 
 // Format date for display
-function formatDate(dateString) {
-    const date = new Date(dateString);
+function formatDate(date, time) {
+    const dateObj = new Date(`${date}T${time || '00:00'}`);
     const options = { 
         weekday: 'short',
         month: 'short', 
         day: 'numeric', 
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit'
+        year: 'numeric'
     };
-    return date.toLocaleDateString('en-US', options);
+    let formatted = dateObj.toLocaleDateString('en-US', options);
+    
+    if (time) {
+        const timeOptions = { hour: 'numeric', minute: '2-digit' };
+        formatted += ' at ' + dateObj.toLocaleTimeString('en-US', timeOptions);
+    }
+    
+    return formatted;
 }
 
 // Create event card HTML
@@ -63,7 +74,7 @@ function createEventCard(event, showEditButton = true) {
             ${showEditButton ? `<button class="edit-btn" onclick="openEditModal(${event.id})">Edit</button>` : ''}
         </div>
         <div class="event-details">
-            <p><strong>📅 Date & Time:</strong> ${formatDate(event.date)}</p>
+            <p><strong>📅 Date & Time:</strong> ${formatDate(event.date, event.time)}</p>
             <p><strong>📍 Location:</strong> ${event.location}</p>
             <p><strong>🎯 Activity:</strong> ${event.activity}</p>
             <p><strong>👥 People Confirmed:</strong> ${event.people}</p>
@@ -82,7 +93,7 @@ function renderEvents(containerId, limit = null) {
     
     // Filter to only show future events
     const now = new Date();
-    events = events.filter(e => new Date(e.date) >= now);
+    events = events.filter(e => new Date(`${e.date}T${e.time || '00:00'}`) >= now);
     
     if (limit) {
         events = events.slice(0, limit);
@@ -109,6 +120,7 @@ function openEditModal(eventId) {
     document.getElementById('edit-event-id').value = event.id;
     document.getElementById('edit-title').value = event.title;
     document.getElementById('edit-date').value = event.date;
+    document.getElementById('edit-time').value = event.time || '';
     document.getElementById('edit-location').value = event.location;
     document.getElementById('edit-activity').value = event.activity;
     document.getElementById('edit-people').value = event.people;
@@ -133,6 +145,7 @@ function saveEventChanges() {
         id: id,
         title: document.getElementById('edit-title').value,
         date: document.getElementById('edit-date').value,
+        time: document.getElementById('edit-time').value,
         location: document.getElementById('edit-location').value,
         activity: document.getElementById('edit-activity').value,
         people: document.getElementById('edit-people').value
@@ -150,6 +163,7 @@ function saveEventChanges() {
 function openAddModal() {
     document.getElementById('add-title').value = '';
     document.getElementById('add-date').value = '';
+    document.getElementById('add-time').value = '';
     document.getElementById('add-location').value = '';
     document.getElementById('add-activity').value = '';
     document.getElementById('add-people').value = '';
@@ -169,6 +183,7 @@ function addNewEvent() {
         id: newId,
         title: document.getElementById('add-title').value,
         date: document.getElementById('add-date').value,
+        time: document.getElementById('add-time').value,
         location: document.getElementById('add-location').value,
         activity: document.getElementById('add-activity').value,
         people: document.getElementById('add-people').value
