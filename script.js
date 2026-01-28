@@ -3,7 +3,6 @@
 // Default events data
 const defaultEvents = [
     {
-        id: 1,
         title: "MARTY SUPREMEEEE",
         date: "2026-01-31",
         time: "14:00",
@@ -12,7 +11,6 @@ const defaultEvents = [
         people: "Nimeesha, Tanish, Olwethu"
     },
     {
-        id: 2,
         title: "Game Night",
         date: "2026-01-31",
         time: "19:00",
@@ -36,7 +34,9 @@ function loadEventsFromFirebase() {
     const eventsRef = database.ref('events');
     eventsRef.on('value', (snapshot) => {
         const data = snapshot.val();
-        if (data) {
+        if (data && Array.isArray(data)) {
+            eventsData = data;
+        } else if (data) {
             eventsData = Object.values(data);
         } else {
             // Initialize with defaults if empty
@@ -51,11 +51,7 @@ function loadEventsFromFirebase() {
 // Save events to Firebase
 function saveEventsToFirebase(events) {
     const eventsRef = database.ref('events');
-    const eventsObject = {};
-    events.forEach(event => {
-        eventsObject[event.id] = event;
-    });
-    eventsRef.set(eventsObject);
+    eventsRef.set(events);
 }
 
 // Get events (now uses global data)
@@ -135,15 +131,15 @@ function formatDate(date, time) {
 }
 
 // Create event card HTML
-function createEventCard(event, showEditButton = true) {
+function createEventCard(event, index, showEditButton = true) {
     const card = document.createElement('div');
     card.className = 'event-card';
-    card.dataset.id = event.id;
+    card.dataset.index = index;
     
     card.innerHTML = `
         <div class="event-header">
             <h3>${event.title}</h3>
-            ${showEditButton ? `<button class="edit-btn" onclick="openEditModal(${event.id})">Edit</button>` : ''}
+            ${showEditButton ? `<button class="edit-btn" onclick="openEditModal(${index})">Edit</button>` : ''}
         </div>
         <div class="event-details">
             <p><strong>📅 Date & Time:</strong> ${formatDate(event.date, event.time)}</p>
@@ -178,18 +174,18 @@ function renderEvents(containerId, limit = null) {
         return;
     }
     
-    events.forEach(event => {
-        container.appendChild(createEventCard(event));
+    events.forEach((event, index) => {
+        container.appendChild(createEventCard(event, index));
     });
 }
 
 // Open edit modal
-function openEditModal(eventId) {
+function openEditModal(index) {
     const events = loadEvents();
-    const event = events.find(e => e.id === eventId);
+    const event = events[index];
     if (!event) return;
     
-    document.getElementById('edit-event-id').value = event.id;
+    document.getElementById('edit-event-id').value = index;
     document.getElementById('edit-title').value = event.title;
     document.getElementById('edit-date').value = event.date;
     document.getElementById('edit-time').value = event.time || '';
@@ -207,14 +203,12 @@ function closeEditModal() {
 
 // Save event changes
 function saveEventChanges() {
-    const id = parseInt(document.getElementById('edit-event-id').value);
+    const index = parseInt(document.getElementById('edit-event-id').value);
     const events = loadEvents();
-    const eventIndex = events.findIndex(e => e.id === id);
     
-    if (eventIndex === -1) return;
+    if (index < 0 || index >= events.length) return;
     
-    events[eventIndex] = {
-        id: id,
+    events[index] = {
         title: document.getElementById('edit-title').value,
         date: document.getElementById('edit-date').value,
         time: document.getElementById('edit-time').value,
@@ -225,10 +219,6 @@ function saveEventChanges() {
     
     saveEvents(events);
     closeEditModal();
-    
-    // Re-render events on both pages if elements exist
-    renderEvents('events-container', 2);
-    renderEvents('all-events-container');
 }
 
 // Add new event
@@ -249,10 +239,8 @@ function closeAddModal() {
 
 function addNewEvent() {
     const events = loadEvents();
-    const newId = Math.max(...events.map(e => e.id), 0) + 1;
     
     const newEvent = {
-        id: newId,
         title: document.getElementById('add-title').value,
         date: document.getElementById('add-date').value,
         time: document.getElementById('add-time').value,
@@ -264,21 +252,17 @@ function addNewEvent() {
     events.push(newEvent);
     saveEvents(events);
     closeAddModal();
-    
-    renderEvents('events-container', 2);
-    renderEvents('all-events-container');
 }
 
-// Delete event
+// Delete event by index
 function deleteEvent() {
-    const id = parseInt(document.getElementById('edit-event-id').value);
+    const index = parseInt(document.getElementById('edit-event-id').value);
     let events = loadEvents();
-    events = events.filter(e => e.id !== id);
-    saveEvents(events);
+    if (index >= 0 && index < events.length) {
+        events.splice(index, 1);
+        saveEvents(events);
+    }
     closeEditModal();
-    
-    renderEvents('events-container', 2);
-    renderEvents('all-events-container');
 }
 
 // ==================== FAN FAVOURITE GAMES ====================
