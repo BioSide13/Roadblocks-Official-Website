@@ -20,8 +20,17 @@ const defaultEvents = [
     }
 ];
 
-// Default games
-const defaultGames = ["Among Us", "Gartic Phone", "Roblox Horror Games"];
+// Default games - now with vote tracking
+// Each game is an object with name and votes array
+const defaultGames = [
+    { name: "Among Us", votes: [] },
+    { name: "Gartic Phone", votes: [] },
+    { name: "Roblox Horror Games", votes: [] }
+];
+
+// Total members for majority calculation
+const TOTAL_MEMBERS = 15;
+const MAJORITY_VOTES = Math.ceil(TOTAL_MEMBERS / 2); // 8 votes needed
 
 // Global data storage
 let eventsData = [];
@@ -265,27 +274,103 @@ function deleteEvent() {
     closeEditModal();
 }
 
-// ==================== FAN FAVOURITE GAMES ====================
+// ==================== FAN FAVOURITE GAMES WITH VOTING ====================
 
-// Render games
-function renderGames() {
-    const container = document.getElementById('games-container');
-    if (!container) return;
+// Check if a game is a fan favourite (has majority votes)
+function isFanFavourite(game) {
+    return game.votes && game.votes.length >= MAJORITY_VOTES;
+}
+
+// Create game card HTML with voting
+function createGameCard(game, index) {
+    const voteCount = game.votes ? game.votes.length : 0;
+    const isFav = isFanFavourite(game);
+    const votesNeeded = MAJORITY_VOTES - voteCount;
     
-    const games = loadGames();
-    container.innerHTML = '';
+    const gameCard = document.createElement('div');
+    gameCard.className = `game-card ${isFav ? 'fan-fav' : ''}`;
     
-    if (games.length === 0) {
-        container.innerHTML = '<p class="no-games">No games added yet.</p>';
-        return;
+    let votersDisplay = '';
+    if (game.votes && game.votes.length > 0) {
+        votersDisplay = `<div class="voters">Voted: ${game.votes.join(', ')}</div>`;
     }
     
-    games.forEach(game => {
-        const gameTag = document.createElement('div');
-        gameTag.className = 'game-tag';
-        gameTag.innerHTML = `<span>${game}</span>`;
-        container.appendChild(gameTag);
+    let statusText = '';
+    if (isFav) {
+        statusText = '<span class="status-badge fav">⭐ Fan Favourite!</span>';
+    } else if (voteCount > 0) {
+        statusText = `<span class="status-badge pending">${votesNeeded} more vote${votesNeeded !== 1 ? 's' : ''} needed</span>`;
+    } else {
+        statusText = '<span class="status-badge">No votes yet</span>';
+    }
+    
+    gameCard.innerHTML = `
+        <div class="game-card-header">
+            <h4>${game.name}</h4>
+            <button class="vote-btn" onclick="openVoteModal(${index})">🗳️ Vote</button>
+        </div>
+        <div class="game-card-body">
+            <div class="vote-count">
+                <span class="vote-number">${voteCount}</span>/<span class="vote-total">${TOTAL_MEMBERS}</span> votes
+            </div>
+            <div class="vote-bar">
+                <div class="vote-fill" style="width: ${(voteCount / TOTAL_MEMBERS) * 100}%"></div>
+                <div class="vote-threshold" style="left: ${(MAJORITY_VOTES / TOTAL_MEMBERS) * 100}%"></div>
+            </div>
+            ${statusText}
+            ${votersDisplay}
+        </div>
+    `;
+    
+    return gameCard;
+}
+
+// Render games in both sections
+function renderGames() {
+    const fanFavContainer = document.getElementById('fan-favourites-container');
+    const considerationContainer = document.getElementById('in-consideration-container');
+    
+    if (!fanFavContainer || !considerationContainer) return;
+    
+    const games = loadGames();
+    
+    // Separate games into fan favourites and in consideration
+    const fanFavourites = [];
+    const inConsideration = [];
+    
+    games.forEach((game, index) => {
+        // Migrate old string format to new object format
+        if (typeof game === 'string') {
+            game = { name: game, votes: [] };
+            games[index] = game;
+        }
+        
+        if (isFanFavourite(game)) {
+            fanFavourites.push({ game, index });
+        } else {
+            inConsideration.push({ game, index });
+        }
     });
+    
+    // Render fan favourites
+    fanFavContainer.innerHTML = '';
+    if (fanFavourites.length === 0) {
+        fanFavContainer.innerHTML = '<p class="no-games">No fan favourites yet. Vote for games below!</p>';
+    } else {
+        fanFavourites.forEach(({ game, index }) => {
+            fanFavContainer.appendChild(createGameCard(game, index));
+        });
+    }
+    
+    // Render in consideration
+    considerationContainer.innerHTML = '';
+    if (inConsideration.length === 0) {
+        considerationContainer.innerHTML = '<p class="no-games">All games are fan favourites! Suggest a new game.</p>';
+    } else {
+        inConsideration.forEach(({ game, index }) => {
+            considerationContainer.appendChild(createGameCard(game, index));
+        });
+    }
 }
 
 // Open add game modal
@@ -305,7 +390,18 @@ function addGame() {
     if (!name) return;
     
     const games = loadGames();
-    games.push(name);
+    // Check if game already exists
+    const exists = games.some(g => {
+        const gameName = typeof g === 'string' ? g : g.name;
+        return gameName.toLowerCase() === name.toLowerCase();
+    });
+    
+    if (exists) {
+        alert('This game already exists!');
+        return;
+    }
+    
+    games.push({ name: name, votes: [] });
     saveGames(games);
     closeAddGameModal();
 }
@@ -317,6 +413,92 @@ function removeGame(index) {
         games.splice(index, 1);
         saveGames(games);
     }
+}
+
+// ==================== VOTING FUNCTIONS ====================
+
+// Open vote modal
+function openVoteModal(gameIndex) {
+    const games = loadGames();
+    const game = games[gameIndex];
+    if (!game) return;
+    
+    const gameName = typeof game === 'string' ? game : game.name;
+    
+    document.getElementById('vote-game-id').value = gameIndex;
+    document.getElementById('vote-game-name-display').textContent = gameName;
+    document.getElementById('voter-name').value = '';
+    document.getElementById('vote-modal').classList.add('active');
+}
+
+// Close vote modal
+function closeVoteModal() {
+    document.getElementById('vote-modal').classList.remove('active');
+}
+
+// Submit vote
+function submitVote() {
+    const gameIndex = parseInt(document.getElementById('vote-game-id').value);
+    const voterName = document.getElementById('voter-name').value;
+    
+    if (!voterName) {
+        alert('Please select your name!');
+        return;
+    }
+    
+    const games = loadGames();
+    let game = games[gameIndex];
+    
+    if (!game) return;
+    
+    // Migrate old format if needed
+    if (typeof game === 'string') {
+        game = { name: game, votes: [] };
+        games[gameIndex] = game;
+    }
+    
+    // Initialize votes array if not present
+    if (!game.votes) {
+        game.votes = [];
+    }
+    
+    // Check if user already voted
+    if (game.votes.includes(voterName)) {
+        alert('You have already voted for this game!');
+        return;
+    }
+    
+    // Add vote
+    game.votes.push(voterName);
+    saveGames(games);
+    closeVoteModal();
+}
+
+// Remove vote
+function removeVote() {
+    const gameIndex = parseInt(document.getElementById('vote-game-id').value);
+    const voterName = document.getElementById('voter-name').value;
+    
+    if (!voterName) {
+        alert('Please select your name to remove your vote!');
+        return;
+    }
+    
+    const games = loadGames();
+    let game = games[gameIndex];
+    
+    if (!game) return;
+    
+    // Check if game has votes array
+    if (!game.votes || !game.votes.includes(voterName)) {
+        alert('You have not voted for this game!');
+        return;
+    }
+    
+    // Remove vote
+    game.votes = game.votes.filter(v => v !== voterName);
+    saveGames(games);
+    closeVoteModal();
 }
 
 // Initialize on page load

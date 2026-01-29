@@ -22,12 +22,23 @@
             <p>Cultured People Only</p>
         </section>
 
-        <section class="fan-favourites">
+        <section class="games-section">
             <div class="section-header">
-                <h2>🎮 Fan Favourite Games</h2>
-                <button class="add-btn" onclick="openAddGameModal()">+ Add Game</button>
+                <h2>🎮 Game Voting</h2>
+                <button class="add-btn" onclick="openAddGameModal()">+ Suggest Game</button>
             </div>
-            <div id="games-container" class="games-grid"></div>
+            
+            <div class="games-subsection fan-favourites">
+                <h3>⭐ Fan Favourites</h3>
+                <p class="subsection-desc">Games with 8+ votes from members</p>
+                <div id="fan-favourites-container" class="games-grid"></div>
+            </div>
+            
+            <div class="games-subsection in-consideration">
+                <h3>🗳️ In Consideration</h3>
+                <p class="subsection-desc">Vote for games you want to become Fan Favourites!</p>
+                <div id="in-consideration-container" class="games-grid"></div>
+            </div>
         </section>
 
         <section class="upcoming-events">
@@ -40,12 +51,45 @@
     <!-- Add Game Modal -->
     <div id="add-game-modal" class="modal">
         <div class="modal-content">
-            <h2>Add Fan Favourite Game</h2>
+            <h2>Suggest a Game</h2>
             <label>Game Name</label>
             <input type="text" id="add-game-name" placeholder="e.g., Among Us">
             <div class="modal-buttons">
-                <button class="save-btn" onclick="addGame()">Add Game</button>
+                <button class="save-btn" onclick="addGame()">Suggest Game</button>
                 <button class="cancel-btn" onclick="closeAddGameModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vote Modal -->
+    <div id="vote-modal" class="modal">
+        <div class="modal-content">
+            <h2>Vote for Game</h2>
+            <input type="hidden" id="vote-game-id">
+            <p id="vote-game-name-display" class="vote-game-title"></p>
+            <label>Select Your Name</label>
+            <select id="voter-name">
+                <option value="">-- Select your name --</option>
+                <option value="Advika">Advika</option>
+                <option value="Animesh">Animesh</option>
+                <option value="Arhan">Arhan</option>
+                <option value="Azarya">Azarya</option>
+                <option value="Ishayu">Ishayu</option>
+                <option value="Kavya">Kavya</option>
+                <option value="Manasi">Manasi</option>
+                <option value="Nimeesha">Nimeesha</option>
+                <option value="Olwethu">Olwethu</option>
+                <option value="Palash">Palash</option>
+                <option value="Tahseen">Tahseen</option>
+                <option value="Tanish">Tanish</option>
+                <option value="Vansh">Vansh</option>
+                <option value="Yeshaya">Yeshaya</option>
+                <option value="Yuvansh">Yuvansh</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="save-btn" onclick="submitVote()">Vote</button>
+                <button class="delete-btn" onclick="removeVote()">Remove Vote</button>
+                <button class="cancel-btn" onclick="closeVoteModal()">Cancel</button>
             </div>
         </div>
     </div>
